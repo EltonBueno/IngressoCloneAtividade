@@ -26,7 +26,7 @@ namespace IngressoMVC.Controllers
             if (resultado == null)
                 return View();
 
-            GetAtorDto atorDTO = new GetAtorDto()
+            GetProdutorDto produtor = new GetProdutorDto()
             {
                 Nome = resultado.Nome,
                 Bio = resultado.Bio,
@@ -35,7 +35,7 @@ namespace IngressoMVC.Controllers
                 NomeFilmes = resultado.Filmes.Select(fm => fm.Titulo).ToList()
             };
 
-            return View(atorDTO);
+            return View(produtor);
         }
 
         public IActionResult Criar()

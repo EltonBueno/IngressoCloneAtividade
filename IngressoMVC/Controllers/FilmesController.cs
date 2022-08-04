@@ -2,6 +2,7 @@
 using IngressoMVC.Models;
 using IngressoMVC.Models.ViewModels.RequestDTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace IngressoMVC.Controllers
@@ -17,12 +18,10 @@ namespace IngressoMVC.Controllers
 
         public IActionResult Index() => View(_context.Filmes);
 
-        public IActionResult Detalhes(int id) => View(_context.Filmes.Find(id));
-
         public IActionResult Criar() => View();
 
         [HttpPost]
-        IActionResult Criar(PostFilmeDTO filmeDto)
+        public IActionResult Criar(PostFilmeDTO filmeDto)
         {
             Filme filme = new Filme
                 (
@@ -30,23 +29,18 @@ namespace IngressoMVC.Controllers
                     filmeDto.Descricao,
                     filmeDto.Preco,
                     filmeDto.ImageURL,
-                    _context.Produtores
-                        .FirstOrDefault(x => x.Id == filmeDto.ProdutorId).Id
+                    filmeDto.ProdutorId,
+                    filmeDto.CinemaId
                 );
 
             _context.Add(filme);
             _context.SaveChanges();
 
-            foreach (var categoria in filmeDto.Categorias)
+            foreach (var categoriaId in filmeDto.CategoriasId)
             {
-                int? categoriaId = _context.Categorias.Where(c => c.Nome == categoria).FirstOrDefault().Id;
-
-                if (categoriaId != null)
-                {
-                    var novaCategoria = new FilmeCategoria(filme.Id, categoriaId.Value);
-                    _context.FilmesCategorias.Add(novaCategoria);
-                    _context.SaveChanges();
-                }
+                var novaCategoria = new FilmeCategoria(filme.Id, categoriaId);
+                _context.FilmesCategorias.Add(novaCategoria);
+                _context.SaveChanges();
             }
 
             foreach (var atorId in filmeDto.AtoresId)
@@ -81,22 +75,23 @@ namespace IngressoMVC.Controllers
                 filmeDto.Titulo,
                 filmeDto.Descricao,
                 filmeDto.Preco,
-                filmeDto.ImageURL);
+                filmeDto.ImageURL,
+                filmeDto.ProdutorId,
+                filmeDto.CinemaId);
 
             _context.Update(result);
             _context.SaveChanges();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Detalhes), result);
         }
 
         public IActionResult Deletar(int id)
         {
-            //buscar o filme no banco
             var result = _context.Filmes.FirstOrDefault(x => x.Id == id);
 
             if (result == null)
                 return View("NotFound");
-            //passar o filme na view
+
             return View(result);
         }
 
@@ -109,6 +104,18 @@ namespace IngressoMVC.Controllers
             _context.SaveChanges();
 
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Detalhes(int id)
+        {
+            var result = _context.Filmes
+                .Include(p => p.Produtor)
+                .Include(c => c.Cinema)
+                .Include(fc => fc.FilmesCategorias).ThenInclude(c => c.Categoria)
+                .Include(af => af.AtoresFilmes).ThenInclude(a => a.Ator)
+                .FirstOrDefault(f => f.Id == id);
+
+            return View(result);
         }
     }
 }

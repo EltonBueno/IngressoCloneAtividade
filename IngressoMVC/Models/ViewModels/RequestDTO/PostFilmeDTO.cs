@@ -13,12 +13,12 @@ namespace IngressoMVC.Models.ViewModels.RequestDTO
         public string ImageURL { get; set; }
 
         #region relacionamentos
-        public string NomeCinema { get; set; }
+        public int CinemaId { get; set; }
 
         public int ProdutorId { get; set; }
 
         public List<int> AtoresId { get; set; }
-        public List<string> Categorias { get; set; } //Por Id
+        public List<int> CategoriasId { get; set; } //Por Id
         #endregion
     }
 }

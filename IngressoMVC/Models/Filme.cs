@@ -5,28 +5,18 @@ using System.Collections.Generic;
 namespace IngressoMVC.Models
 {
     public class Filme : IEntidade
-    {
-        public Filme(string titulo, string descricao, decimal preco, string imageURL, int produtor)
-        {
-            Titulo = titulo;
-            Descricao = descricao;
-            Preco = preco;
-            ImageURL = imageURL;
-            ProdutorId = produtor;
-            DataCadastro = DateTime.Now;
-            DataAlteracao = DataCadastro;
-        }
-
-        public Filme(string titulo, string descricao, decimal preco, string imageURL, int cinemaId, int produtorId)
+    {      
+        public Filme(string titulo, string descricao, decimal preco, string imageURL, int produtorId, int cinemaId)
         {
             Titulo = titulo;
             Descricao = descricao;
             Preco = preco;
             ImageURL = imageURL;
             ProdutorId = produtorId;
-            DataCadastro = DateTime.Now;
-            DataAlteracao = DataCadastro;
             CinemaId = cinemaId;
+
+            DataCadastro = DateTime.Now;
+            DataAlteracao = DataCadastro;            
         }
 
         public int Id { get; private set; }
@@ -49,14 +39,16 @@ namespace IngressoMVC.Models
         #endregion
 
 
-        public void AlterarDados(string titulo, string descricao, decimal novoPreco, string imagem)
+        public void AlterarDados(string titulo, string descricao, decimal novoPreco, string imagem, int produtorId, int cinemaId)
         {
-            if (titulo.Length < 3 || novoPreco < 0)
+            if (titulo.Length < 1 || novoPreco < 0)
                 return;
             Titulo = titulo;
             Descricao = descricao;
             Preco = novoPreco;
             ImageURL = imagem;
+            ProdutorId = produtorId;
+            CinemaId = cinemaId;
 
             DataAlteracao = DateTime.Now;
         }

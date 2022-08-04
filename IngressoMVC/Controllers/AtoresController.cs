@@ -30,7 +30,7 @@ namespace IngressoMVC.Controllers
                 .FirstOrDefault(ator => ator.Id == id);
 
             if (resultado == null)
-                return View();
+                return View("NotFound");
 
             GetAtorDto atorDTO = new GetAtorDto()
             {
@@ -104,6 +104,7 @@ namespace IngressoMVC.Controllers
         {
             var result = _context.Atores.FirstOrDefault(a => a.Id == id);
             _context.Atores.Remove(result);
+            _context.SaveChanges();
 
             return RedirectToAction(nameof(Index));
         }
